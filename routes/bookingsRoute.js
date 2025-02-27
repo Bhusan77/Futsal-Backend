@@ -2,152 +2,115 @@ require('dotenv').config();
 
 const express = require('express');
 const router = express.Router();
-
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { v4: uuidv4 } = require('uuid');
 
+const pool = require("../db");
 const Booking = require("../models/booking");
-const Court = require("../models/court");
+const Court = require("../models/court");  // fix path if needed
 
-function generateTransactionId() {
-    let transactionId = '';
-    for (let i = 0; i < 20; i++) {
-        transactionId += Math.floor(Math.random() * 10);
-    }
-    return transactionId;
-}
-
-
-// New Booking Court
+// New Booking Court using dummy QR approach
 router.post("/bookingCourt", async (req, res) => {
-    const {
-        court,
-        userId,
-        startDate,
-        endDate,
-        maxPlayers,
-        totalHours,
-        totalAmount,
-        token,
-    } = req.body;
-
+    const { court, userId, date, maxPlayers, totalAmount, courtId, courtName } = req.body;
     try {
-        const customer = await stripe.customers.create({
-            email: token.email,
-            source: token.id,
-        })
+        const transactionId = uuidv4();
+        // Use the court's name if available, otherwise fallback to the passed courtName.
+        const actualCourtId = (court && court._id) ? court._id : courtId;
+        const actualCourtName = (court && court.name) ? court.name : courtName;
 
-        const idempotencyKey = uuidv4();
+        const savedBooking = await Booking.addBooking({
+            courtName: actualCourtName,
+            courtId: actualCourtId,
+            userId,
+            date,
+            maxPlayers,
+            totalAmount,
+            transactionId,
+            status: "Pending"
+        });
 
-        const payment = await stripe.charges.create(
-            {
-                amount: totalAmount * 100,
-                customer: customer.id,
-                currency: "NZD",
-                receipt_email: token.email,
-            },
-            {
-                idempotencyKey: idempotencyKey,
-            }
-        )
-
-        if (payment.status === 'succeeded') {
-            const newBooking = new Booking({
-                court: court.name,
-                courtId: court._id,
-                userId,
-                startDate,
-                endDate,
-                maxPlayers,
-                totalHours,
-                totalAmount,
-                transactionId: generateTransactionId(),
-            });
-
-            const savedBooking = await newBooking.save();
-
-            const findBooking = await Court.findOne({ _id: court._id });
-
-            findBooking.currentBookings.push({
-                bookingId: savedBooking._id,
-                startDate: startDate,
-                endDate: endDate,
-                userId: savedBooking.userId,
-                status: savedBooking.status,
-            });
-
-            await findBooking.save();
-
-            return res.send("Payment Successful, your booking has been confirmed");
-        }
-        else {
-            throw new Error('Payment failed');
-        }
-
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(savedBooking.id)}&size=200x200`;
+        return res.send({ dummyQR: qrUrl, bookingId: savedBooking.id });
     } catch (error) {
-        console.error("Error in bookingCourt:", error); // Log error for debugging
+        console.error("Error in bookingCourt:", error);
         return res.status(400).json({ message: error.message });
     }
+});
 
+// New endpoint to confirm payment (booking)
+router.post("/confirmPayment", async (req, res) => {
+    const { bookingId, courtId } = req.body;
+    try {
+        // Update booking status to "Confirmed"
+        // Here, reuse cancelBooking or create a dedicated update function.
+        await Booking.cancelBooking(bookingId); // or updateBookingStatus(bookingId, 'Confirmed')
+        // Directly update the bookings table as a dummy implementation:
+        const result = await pool.query(
+            "UPDATE bookings SET status = 'Confirmed' WHERE id = $1 RETURNING *",
+            [bookingId]
+        );
+        // Update the current bookings on the court accordingly
+        let currentCourt = await Court.getCourtById(courtId);
+        const currentBookings = Array.isArray(currentCourt.currentbookings)
+            ? currentCourt.currentbookings
+            : (currentCourt.currentbookings ? JSON.parse(currentCourt.currentbookings) : []);
+        const updatedBookings = currentBookings.map(booking => {
+            if (booking.bookingId === bookingId) {
+                return { ...booking, status: 'Confirmed' };
+            }
+            return booking;
+        });
+        await pool.query(
+            "UPDATE courts SET currentbookings = $1 WHERE id = $2",
+            [JSON.stringify(updatedBookings), courtId]
+        );
+        return res.send("Booking confirmed successfully");
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
 });
 
 // Get Bookings By UserId
 router.post("/getBookingsByUserId", async (req, res) => {
-    const {
-        court,
-        userId,
-        startDate,
-        endDate,
-        totalHours,
-        totalAmount,
-        token,
-        status,
-    } = req.body;
-
+    const { userId } = req.body;
     try {
-        const bookings = await Booking.find({ userId: userId });
+        const bookings = await Booking.getBookingsByUserId(userId);
         res.send(bookings);
     } catch (error) {
-        return res.status(400).json({ message: error });
+        return res.status(400).json({ message: error.message });
     }
 });
-
 
 // Cancel Booking
 router.post("/cancelBooking", async (req, res) => {
     const { bookingId, courtId } = req.body;
-
     try {
-        const currentBooking = await Booking.findOne({ _id: bookingId });
-        currentBooking.status = "Cancelled";
-        await currentBooking.save();
+        await Booking.cancelBooking(bookingId);
 
-        const availableCourt = await Court.findOne({ _id: courtId });
+        let currentCourt = await Court.getCourtById(courtId);
+        const currentBookings = Array.isArray(currentCourt.currentbookings)
+            ? currentCourt.currentbookings
+            : (currentCourt.currentbookings ? JSON.parse(currentCourt.currentbookings) : []);
+        const updatedBookings = currentBookings.filter((booking) => booking.bookingId !== bookingId);
 
-        const bookings = availableCourt.currentBookings;
-        const cancelBooking = bookings.filter((booking) => booking.bookingId.toString() !== bookingId);
-
-        availableCourt.currentBookings = cancelBooking;
-
-        await availableCourt.save();
+        await pool.query(
+            "UPDATE courts SET currentbookings = $1 WHERE id = $2",
+            [JSON.stringify(updatedBookings), courtId]
+        );
 
         return res.send("Your booking cancelled successfully");
     } catch (error) {
-        return res.status(400).json({ message: error });
+        return res.status(400).json({ message: error.message });
     }
 });
-
 
 // Admin - Get All Bookings
 router.get('/getAllBookings', async (req, res) => {
     try {
-        const currentBookings = await Booking.find();
-        res.send(currentBookings);
+        const result = await pool.query("SELECT * FROM bookings");
+        res.send(result.rows);
     } catch (error) {
-        return res.status(400).json({ message: error });
+        return res.status(400).json({ message: error.message });
     }
 });
-
-
 
 module.exports = router;

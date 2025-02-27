@@ -1,4 +1,3 @@
-// Using pg for PostgreSQL interactions. (Ensure a "users" table exists.)
 const pool = require("../db");
 
 module.exports = {
@@ -15,6 +14,10 @@ module.exports = {
             [email]
         );
         return result.rows[0];
+    },
+    async getAllUsers() {
+        const result = await pool.query("SELECT * FROM users");
+        return result.rows;
     }
     // ...other functions as needed...
 };
