@@ -1,0 +1,60 @@
+[
+    {
+        "name": "Healthy Futsal",
+        "imgURLs": [
+            "https://1.bp.blogspot.com/-mwyhXagSQgA/URbBRWBKliI/AAAAAAAABDk/xMETefG4U5g/s1600/Grassroots+Recreational+Center.png",
+            "https://scontent.fktm8-1.fna.fbcdn.net/v/t39.30808-6/471192525_1763542374487131_7669904469149787502_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=qhezPjT0YeIQ7kNvgGuqCHx&_nc_oc=Adghsg4_KLUY8UzP4UGY7HsmIOlhhk8rAfNC2P82tLi96Kl9gMafV0OF9xQVqMYRHPzm4XLgec1zqEQS-aRTGqVn&_nc_zt=23&_nc_ht=scontent.fktm8-1.fna&_nc_gid=Ax6rS0bYqzz3SRPRK_c0KzM&oh=00_AYCI2YwuIvK5zSmBE6fFJKZ5oL7reaAsepgBovRpuYsskw&oe=67C4F851"
+        ],
+        "price": 1500,
+        "type": "Indoor",
+        "maxPlayers": 10,
+        "currentBookings": [],
+        "location": "Maitighar,Kathmandu",
+        "description": "Healthy Futsal - This is a top-notch indoor futsal court located in the Central Place of Kathmandu City. The court is designed to provide an optimal playing experience for futsal enthusiasts. It features state-of-the-art lighting and a well-maintained playing surface, ensuring a high-quality grass."
+    },
+    
+    
+    {
+        "name": "Prime Futsal",
+        "imgURLs": ["https://www.goalnepal.com/uploads/news/1627182357.jpg",
+                    "https://www.myholidaynepal.com/blog/images/blogimage/Dhuku-Futsal-Hub-20130717230903.jpg"],
+        "price": 1700,
+        "type": "Indoor",
+        "maxPlayers": 10,
+        "currentBookings": [],
+        "location": "Gyaneshwor,Kathmandu",
+        "description": "Prime Futsal - Prime Futsal is a top-notch indoor futsal court located in the Gyaneshwor,Kathmandu. The court is designed to provide an optimal playing experience for futsal enthusiasts. It features state-of-the-art lighting and a well-maintained playing surface, ensuring a high-quality carpet."
+    },
+
+
+    {
+        "name": "Northpoint Futsal",
+        "imgURLs": ["https://scontent.fktm8-1.fna.fbcdn.net/v/t1.6435-9/60801221_388633505111266_3313948588945440768_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=j-wY1fkrG9sQ7kNvgGnHvkR&_nc_oc=AdiVyMLQ-ZxeEIiXvrshoJI86wOFs_uYHvRhYia5sKvAp1e9DwWzBBvr4_8nensbnQ7z_ZlUZE2J8PG1n2idpu5i&_nc_zt=23&_nc_ht=scontent.fktm8-1.fna&_nc_gid=AvnnOuoRwoF23j-d7Pr1RkN&oh=00_AYBqVV0cY-_UR5EA2R78-Y3thYBMdDreQZ64-cdCiV-TGg&oe=67E69547",
+                    "https://scontent.fktm8-1.fna.fbcdn.net/v/t1.6435-9/61999809_395271871114096_7792044769231765504_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=wtb17LT4J8wQ7kNvgGpgIQi&_nc_oc=Adgq69lDiRNOxENseXLnFpX_91ZLJnbno0V8zP-DxZhUqnLpdUF6n_gMQBlvyuRImgqw-bxh4Q6YnrkjfyTlc8qp&_nc_zt=23&_nc_ht=scontent.fktm8-1.fna&_nc_gid=AeXdN8cajDoabsdk_a2-ofn&oh=00_AYAj2jCvrM6ABwfFQCASFqjy91j6Zkw1Hr2ZYoil_T-BYw&oe=67E6A7BA"
+    ],
+        "price": 1300,
+        "type": "Indoor",
+        "maxPlayers": 10,
+        "currentBookings": [],
+        "location": "Bode,Madhyapur Thimi-8",
+        "description": "Northpoint Futsal - Northpoint Futsal is a top-notch indoor futsal court located in the Madhyapur Thimi,Ward-8. The court is designed to provide an optimal playing experience for futsal enthusiasts. It features state-of-the-art lighting and a well-maintained playing surface, ensuring a high-quality game environment."
+    },
+
+
+    {
+        "name": "Yala Futsal",
+        "imgURLs": ["https://shorturl.at/rUrW5",
+                    "https://shorturl.at/9hD4A"
+            
+        ],
+        "price": 2000,
+        "type": "Indoor",
+        "maxPlayers": 10,
+        "currentBookings": [],
+        "location": "Imadol,Lalitpur",
+        "description": "Yala Futsal - Yala Futsal,Blue Court is a premier indoor futsal court located in the scenic area of Imadol nearby KIST Hospital. This court offers a unique outdoor playing experience, allowing players to enjoy the game of futsal in the fresh air,fresh carpet and a good lighting."
+    }
+    
+       
+    
+]
