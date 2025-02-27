@@ -21,9 +21,8 @@ module.exports = {
     },
 
     async cancelBooking(bookingId) {
-        // Delete cancelled booking from the database.
         const result = await pool.query(
-            "DELETE FROM bookings WHERE id = $1 RETURNING *",
+            "UPDATE bookings SET status = 'Cancelled' WHERE id = $1 RETURNING *",
             [bookingId]
         );
         return result.rows[0];
